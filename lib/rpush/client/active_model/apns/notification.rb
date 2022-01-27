@@ -7,6 +7,7 @@ module Rpush
           APNS_PRIORITY_IMMEDIATE = 10
           APNS_PRIORITY_CONSERVE_POWER = 5
           APNS_PRIORITIES = [APNS_PRIORITY_IMMEDIATE, APNS_PRIORITY_CONSERVE_POWER]
+          APNS_INTERRUPTION_LEVELS = ['passive', 'active', 'time-sensitive', 'critical']
           MAX_PAYLOAD_BYTESIZE = 2048
 
           module ClassMethods
@@ -54,7 +55,7 @@ module Rpush
 
           INTERRUPTION_LEVEL_KEY = '__rpush_interruption_level__'
           def interruption_level=(string)
-            return unless string && ['passive', 'active', 'time-sensitive', 'critical'].include?(string)
+            return unless string && APNS_INTERRUPTION_LEVELS.include?(string)
             self.data = (data || {}).merge(INTERRUPTION_LEVEL_KEY => string)
           end
 
@@ -99,7 +100,7 @@ module Rpush
               end
 
               if data
-                non_aps_attributes = data.reject { |k, _| k == CONTENT_AVAILABLE_KEY || k == MUTABLE_CONTENT_KEY }
+                non_aps_attributes = data.reject { |k, _| k == CONTENT_AVAILABLE_KEY || k == MUTABLE_CONTENT_KEY || k == INTERRUPTION_LEVEL_KEY || k == RELEVANCE_SCORE_KEY }
                 non_aps_attributes.each { |k, v| json[k.to_s] = v }
               end
             end
