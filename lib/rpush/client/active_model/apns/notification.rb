@@ -52,6 +52,18 @@ module Rpush
             self.data = (data || {}).merge(CONTENT_AVAILABLE_KEY => true)
           end
 
+          INTERRUPTION_LEVEL_KEY = '__rpush_interruption_level__'
+          def interruption_level=(string)
+            return unless string && ['passive', 'active', 'time-sensitive', 'critical'].include?(string)
+            self.data = (data || {}).merge(INTERRUPTION_LEVEL_KEY => string)
+          end
+
+          RELEVANCE_SCORE_KEY = '__rpush_relevance_score__'
+          def content_available=(float)
+            return unless float
+            self.data = (data || {}).merge(RELEVANCE_SCORE_KEY => float.clamp(0.0, 1.0))
+          end
+
           def content_available?
             (self.data || {})[CONTENT_AVAILABLE_KEY]
           end
@@ -76,6 +88,14 @@ module Rpush
 
               if data && data[CONTENT_AVAILABLE_KEY]
                 json['aps']['content-available'] = 1
+              end
+
+              if data && data[INTERRUPTION_LEVEL_KEY]
+                json['aps']['interruption-level'] = data[INTERRUPTION_LEVEL_KEY].to_s
+              end
+
+              if data && data[RELEVANCE_SCORE_KEY]
+                json['aps']['relevance-score'] = data[RELEVANCE_SCORE_KEY].to_f
               end
 
               if data
