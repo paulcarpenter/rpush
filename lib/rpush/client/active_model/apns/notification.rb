@@ -59,7 +59,7 @@ module Rpush
           end
 
           RELEVANCE_SCORE_KEY = '__rpush_relevance_score__'
-          def content_available=(float)
+          def relevance_score=(float)
             return unless float
             self.data = (data || {}).merge(RELEVANCE_SCORE_KEY => float.clamp(0.0, 1.0))
           end
